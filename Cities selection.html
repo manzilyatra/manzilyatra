@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ManzilYatra - Travel Booking</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #ff6600;
+            color: white;
+            padding: 15px;
+            font-size: 24px;
+        }
+        .hero {
+            background-color: #f4f4f4;
+            padding: 50px;
+        }
+        .hero h1 {
+            font-size: 36px;
+        }
+        .search-bar {
+            margin: 20px;
+        }
+        .search-bar select, .search-bar button {
+            padding: 10px;
+            width: 30%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .routes, .contact, .booking, .search-results {
+            margin: 20px;
+            padding: 20px;
+        }
+        .booking form, .search-results table {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .booking input, .booking select, .search-results select {
+            margin: 10px;
+            padding: 10px;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .booking button, .search-results button {
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #ff6600;
+            color: white;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        ManzilYatra - Travel Booking
+    </header>
+    <div class="hero">
+        <h1>Travel Made Easy with ManzilYatra</h1>
+        <p>Book your ride hassle-free and reach your destination on time.</p>
+    </div>
+    <div class="search-bar">
+        <select id="start-journey">
+            <option value="">Select Start Location</option>
+            <option value="Khutikatia">Khutikatia</option>
+            <option value="Lakhinagar">Lakhinagar</option>
+            <option value="Nowgong College">Nowgong College</option>
+        </select>
+        <select id="end-journey">
+            <option value="">Select Destination</option>
+            <option value="Jagiroad">Jagiroad</option>
+            <option value="Sonapur">Sonapur</option>
+            <option value="Khanapara">Khanapara</option>
+        </select>
+        <button onclick="searchTravellers()">Search</button>
+        <p id="price-display"></p>
+    </div>
+    <div class="search-results" id="results">
+        <h2>Available Travellers</h2>
+        <table>
+            <tr>
+                <th>Timing</th>
+                <th>Reg. Number</th>
+                <th>Seats Available</th>
+                <th>Departure Time</th>
+                <th>Book</th>
+            </tr>
+            <tbody id="traveller-list">
+            </tbody>
+        <caption> <i>We will soon update seat selection process.</i></caption>
+        </table>
+    </div>
+    <div class="contact">
+        <h2>Contact Us</h2>
+        <p>Email: support@manzilyatra.com</p>
+        <p>Phone: 8876787820</p>
+    </div>
+    <footer>
+        &copy; 2025 ManzilYatra. All rights reserved.
+    </footer>
+    
+    <script>
+        const fareChart = {
+            "Khutikatia-Jagiroad": 80,
+            "Khutikatia-Sonapur": 130,
+            "Khutikatia-Khanapara": 170,
+            "Lakhinagar-Jagiroad": 80,
+            "Lakhinagar-Sonapur": 130,
+            "Lakhinagar-Khanapara": 170,
+            "Nowgong College-Jagiroad": 90,
+            "Nowgong College-Sonapur": 140,
+            "Nowgong College-Khanapara": 180
+        };
+
+        function searchTravellers() {
+            const start = document.getElementById("start-journey").value;
+            const end = document.getElementById("end-journey").value;
+            if (!start || !end) {
+                alert("Please select both start and end journey locations.");
+                return;
+            }
+            
+            const routeKey = `${start}-${end}`;
+            const price = fareChart[routeKey] || "Not Available";
+            document.getElementById("price-display").innerText = `Estimated Price: ₹${price}`;
+            
+            const travellers = [
+                { timing: "6:00 AM", regNumber: "AS02AB1234", seats: 4, departure: "6:15 AM" },
+                { timing: "8:00 AM", regNumber: "AS02CD5678", seats: 2, departure: "8:15 AM" },
+                { timing: "10:00 AM", regNumber: "AS02EF9101", seats: 5, departure: "10:15 AM" }
+            ];
+            let tableBody = document.getElementById("traveller-list");
+            tableBody.innerHTML = "";
+            travellers.forEach(traveller => {
+                let row = `<tr>
+                    <td>${traveller.timing}</td>
+                    <td>${traveller.regNumber}</td>
+                    <td>${traveller.seats}</td>
+                    <td>${traveller.departure}</td>
+                    <td><button onclick="payNow('${traveller.regNumber}', '${price}')">Pay Now</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+        
+        function payNow(regNumber, amount) {
+            const upiLink = `upi://pay?pa=swibswid-1@okhdfcbank&pn=ManzilYatra&am=${amount}&cu=INR&tn=Booking-${regNumber}`;
+            window.location.href = upiLink;
+        }
+    </script>
+<i><u>Please share the screenshot to this number 8876787820 after successful payment.</u></i>
+</body>
+</html>
